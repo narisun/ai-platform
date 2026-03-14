@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-conf
+  namespace: ai-platform
+data:
+  otel-collector-config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    
+    processors:
+      batch:
+        send_batch_size: 1000
+        timeout: 10s
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 1000
+    
+    exporters:
+      # Exporting traces directly to the Dynatrace Platform
+      otlphttp/dynatrace:
+        endpoint: "https://${DYNATRACE_TENANT}.live.dynatrace.com/api/v2/otlp"
+        headers:
+          Authorization: "Api-Token ${DYNATRACE_API_TOKEN}"
+    
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/dynatrace]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/dynatrace]

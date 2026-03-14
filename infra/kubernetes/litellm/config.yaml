@@ -1,0 +1,23 @@
+model_list:
+  # Fast/Cheap Routing for Planning/Classification
+  - model_name: claude-3-haiku
+    litellm_params:
+      model: bedrock/anthropic.claude-3-haiku-20240307-v1:0
+      aws_region: us-east-1
+  
+  # Complex Reasoning / Synthesis
+  - model_name: claude-3-sonnet
+    litellm_params:
+      model: bedrock/anthropic.claude-3-sonnet-20240229-v1:0
+      aws_region: us-east-1
+
+litellm_settings:
+  # Enable Redis for Prompt Caching to achieve 90% token savings on static prompts
+  cache: true
+  cache_type: redis
+  redis_host: "redis-master.ai-platform.svc.cluster.local"
+  redis_port: 6379
+  
+  # Send token usage and latency metrics directly to our OTel Collector
+  success_callback: ["otel"]
+  failure_callback: ["otel"]
