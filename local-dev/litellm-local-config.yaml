@@ -1,0 +1,17 @@
+model_list:
+  # Route to local Ollama
+  - model_name: fast-routing
+    litellm_params:
+      model: ollama/llama3
+      api_base: http://host.docker.internal:11434
+  
+  - model_name: complex-routing
+    litellm_params:
+      model: ollama/llama3
+      api_base: http://host.docker.internal:11434
+
+litellm_settings:
+  cache: true
+  cache_type: redis
+  redis_host: "redis" 
+  redis_port: 6379

@@ -14,5 +14,43 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  redis:
+    image: redis:alpine
+    container_name: local-redis
+    ports:
+      - "6379:6379"
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: local-litellm
+    ports:
+      - "4000:4000"
+    environment:
+      # Pass AWS credentials from the host machine to access Bedrock
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - LITELLM_MASTER_KEY=sk-enterprise-local-dev
+      # Force Redis connection via environment variables
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./litellm-local-config.yaml:/app/config.yaml
+    command: [ "--config", "/app/config.yaml", "--detailed_debug" ]
+    depends_on:
+      - redis
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: local-otel-collector
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+    environment:
+      # Pass your Dynatrace credentials into the container
+      - DYNATRACE_ENDPOINT=${DYNATRACE_ENDPOINT}
+      - DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}
+    volumes:
+      - ./otel-local-config.yaml:/etc/otelcol-contrib/config.yaml
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
 volumes:
   pgdata:
