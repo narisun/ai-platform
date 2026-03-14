@@ -22,6 +22,7 @@ export AWS_SECRET_ACCESS_KEY="your_secret_access_key"
 export AWS_SESSION_TOKEN="your_session_token" # (If using temporary STS credentials)
 export AWS_DEFAULT_REGION="us-east-1"
 
+```
 ## Folder Structure
 
 ```
