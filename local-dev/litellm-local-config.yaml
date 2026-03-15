@@ -1,14 +1,11 @@
 model_list:
-  # Route to local Ollama
-  - model_name: fast-routing
+  - model_name: complex-routing  # LangGraph asks for this
     litellm_params:
-      model: ollama/llama3
-      api_base: http://host.docker.internal:11434
-  
-  - model_name: complex-routing
-    litellm_params:
-      model: ollama/llama3
-      api_base: http://host.docker.internal:11434
+      # The 'azure/' prefix tells LiteLLM which cloud provider API to use.
+      model: azure/gpt-4o-mini-deployment
+      api_base: os.environ/AZURE_API_BASE
+      api_key: os.environ/AZURE_API_KEY
+      api_version: os.environ/AZURE_API_VERSION
 
 litellm_settings:
   cache: true
